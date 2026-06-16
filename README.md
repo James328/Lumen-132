@@ -1,5 +1,7 @@
 # HUME Lumen 132
 
+![HUME Lumen 132 Watch Animation](renders/HUME-Lumen-132.gif)
+
 An open-hardware **LED wristwatch** that tells time with light. No mechanical hands,
 no display module — time is shown by **132 individually-addressable LEDs** in
 concentric rings on a PCB dial, their light carried to the face through optical
