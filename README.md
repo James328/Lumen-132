@@ -79,6 +79,16 @@ The firmware is a simple sleep/wake loop — the driver does the hard real-time 
   </p>
 </picture>
 
+### Bill of Materials (rev 2 — ATtiny3217 + IS31FL3743A)
+
+[`LED_Watch_BOM.xlsx`](bom/LED_Watch_BOM.xlsx) — sourced parts list with live formulas (edit blue qty/price
+cells; totals recalculate). Three sections: dial+mask / controller / case+optics.
+
+Per-watch estimate (single quantity, June 2026 pricing): **~$131**
+- Dial board + mask ~$39 (132 × 0201 LEDs dominate)
+- Controller board ~$12 (ATtiny3217 + IS31FL3743A driver)
+- Case / optics / mechanical ~$80
+
 ## The dial
 
 Time reads across three concentric zones radiating from the center, with the
@@ -123,9 +133,6 @@ browser (orbit/tilt/pan/zoom, exploded-layer toggle).
 
 The protected LiPo is the thickness bottleneck (~3.2 mm); total stack is ~9–10 mm,
 which fits the target case.
-
-## BOM
-> TODO: Link to BOM here.
 
 ## Repository layout
 
