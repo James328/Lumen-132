@@ -1,4 +1,4 @@
-# HUME Lumen 132
+# Lumen 132
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="renders/HUME-Lumen-132.gif">
