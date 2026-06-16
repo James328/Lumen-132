@@ -7,6 +7,11 @@
 > `dial.net`, `connections.csv`, `dial_pcb_route.*`, `optimize_lowpins.py`, and the
 > Charlieplex net assignment are stale. Regenerating this is the main open task.
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="dial_pcb_route.png">
+  <img alt="HUME Lumen 132" src="dial_pcb_route.png" width="640">
+</picture>
+
 ---
 
 # Dial board — placement & Charlieplex netlist
