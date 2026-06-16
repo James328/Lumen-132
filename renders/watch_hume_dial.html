@@ -1,0 +1,197 @@
+<div id="app" style="width:100%;height:100vh;overflow:hidden;background:#000;"></div>
+<div style="position:fixed;left:0;right:0;bottom:0;display:flex;gap:14px;align-items:center;padding:10px 16px;font-family:system-ui,sans-serif;font-size:13px;color:#bbb;background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);">
+  <button id="play" style="background:#222;color:#eee;border:1px solid #444;border-radius:8px;padding:6px 14px;cursor:pointer;">Pause</button>
+  <label>Speed <input id="speed" type="range" min="1" max="120" value="40" style="width:120px;vertical-align:middle;"> <span id="spd">40×</span></label>
+  <label style="cursor:pointer;"><input id="inv" type="checkbox"> light dial</label>
+  <span id="clock" style="margin-left:auto;font-variant-numeric:tabular-nums;color:#fff;font-size:15px;">--:--:--</span>
+</div>
+
+<script>
+const app=document.getElementById('app');
+const NS="http://www.w3.org/2000/svg";
+let W,H,CX,CY,Rdial;
+const svg=document.createElementNS(NS,"svg");
+svg.setAttribute("xmlns",NS); app.appendChild(svg);
+
+let inverse=false;
+function theme(){
+  return inverse
+   ? {bg:"#000", face:"#efece6", faceEdge:"#d8d4cc", ink:"#111", sub:"#333",
+      sec:"#e8403a", min:"#0f8f6a", hour:"#c47e10", dot:"#111", idx:"#222"}
+   : {bg:"#000", face:"#0a0a0c", faceEdge:"#1c1c22", ink:"#f4f4f6", sub:"#cfcfcf",
+      sec:"#6fb4ff", min:"#4fd6a6", hour:"#f2a623", dot:"#fff", idx:"#d8d8dc"};
+}
+
+let simSeconds=10*3600+8*60+30, playing=true, speed=40, last=performance.now();
+
+function layout(){
+  W=app.clientWidth; H=app.clientHeight;
+  svg.setAttribute("width",W); svg.setAttribute("height",H);
+  svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+  CX=W/2; CY=H/2; Rdial=Math.min(W,H)*0.42;
+}
+layout();
+
+function draw(){
+  const t=theme();
+  while(svg.firstChild) svg.removeChild(svg.firstChild);
+  app.style.background=t.bg;
+
+  // dial face
+  const face=document.createElementNS(NS,"circle");
+  face.setAttribute("cx",CX); face.setAttribute("cy",CY); face.setAttribute("r",Rdial);
+  face.setAttribute("fill",t.face); face.setAttribute("stroke",t.faceEdge); face.setAttribute("stroke-width",2);
+  svg.appendChild(face);
+
+  // ---- printed hour indices (12), like the HUME design ----
+  for(let i=0;i<12;i++){
+    const a=(i*30-90)*Math.PI/180;
+    const isTop=(i===0);
+    const rOut=Rdial*0.93, rIn=Rdial*(isTop?0.84:0.87);
+    const x1=CX+rIn*Math.cos(a), y1=CY+rIn*Math.sin(a);
+    const x2=CX+rOut*Math.cos(a), y2=CY+rOut*Math.sin(a);
+    const ln=document.createElementNS(NS,"line");
+    ln.setAttribute("x1",x1);ln.setAttribute("y1",y1);ln.setAttribute("x2",x2);ln.setAttribute("y2",y2);
+    ln.setAttribute("stroke",t.idx); ln.setAttribute("stroke-width",isTop?5:3); ln.setAttribute("stroke-linecap","round");
+    svg.appendChild(ln);
+  }
+
+  // ---- HUME crest (shield + integrated H) + wordmark (top) ----
+  const cy0=CY-Rdial*0.60;
+  // shield: flat top, straight sides, curve to a soft point
+  const sTop=cy0-Rdial*0.045;          // shield top edge
+  const sHalf=Rdial*0.060;             // half width
+  const sSideBot=cy0+Rdial*0.055;      // where sides start curving
+  const sTip=cy0+Rdial*0.15;          // bottom point
+  const csw=Rdial*0.013;               // stroke width
+  const shield=document.createElementNS(NS,"path");
+  shield.setAttribute("d",
+    `M ${CX-sHalf} ${sTop} L ${CX-sHalf} ${sSideBot} `+
+    `Q ${CX-sHalf} ${sTip-Rdial*0.025} ${CX} ${sTip} `+
+    `Q ${CX+sHalf} ${sTip-Rdial*0.025} ${CX+sHalf} ${sSideBot} `+
+    `L ${CX+sHalf} ${sTop}`);
+  shield.setAttribute("fill","none"); shield.setAttribute("stroke",t.ink);
+  shield.setAttribute("stroke-width",csw); shield.setAttribute("stroke-linejoin","miter");
+  svg.appendChild(shield);
+  // integrated H: two posts rising above the top edge, joined by a crossbar
+  const pHalf=Rdial*0.06;             // half distance between posts
+  const pTop=cy0-Rdial*0.085;          // posts rise above shield top
+  const pBot=cy0+Rdial*0.030;          // posts extend below the bar
+  const barY=cy0-Rdial*0.005;          // crossbar y
+  for(const sgn of [-1,1]){
+    // const post=document.createElementNS(NS,"line");
+    // post.setAttribute("x1",CX+sgn*pHalf); post.setAttribute("y1",pTop);
+    // post.setAttribute("x2",CX+sgn*pHalf); post.setAttribute("y2",pBot);
+    // post.setAttribute("stroke",t.ink); post.setAttribute("stroke-width",csw);
+    // post.setAttribute("stroke-linecap","square");
+    // svg.appendChild(post);
+  }
+  const hbar=document.createElementNS(NS,"line");
+  hbar.setAttribute("x1",CX-pHalf); hbar.setAttribute("y1",barY);
+  hbar.setAttribute("x2",CX+pHalf); hbar.setAttribute("y2",barY);
+  hbar.setAttribute("stroke",t.ink); hbar.setAttribute("stroke-width",csw);
+  svg.appendChild(hbar);
+
+  const hume=document.createElementNS(NS,"text");
+  hume.setAttribute("x",CX); hume.setAttribute("y",cy0+Rdial*0.28);
+  hume.setAttribute("text-anchor","middle"); hume.setAttribute("fill",t.ink);
+  hume.setAttribute("font-family","Arial,Helvetica,sans-serif");
+  hume.setAttribute("font-weight","800");
+  hume.setAttribute("letter-spacing",Rdial*0.018);
+  hume.setAttribute("font-size",Rdial*0.115); hume.textContent="HUME";
+  svg.appendChild(hume);
+
+  // ---- co-brand slot above 6 o'clock (per locked design) + MASTER CHRONOMETER ----
+  // A defined, quiet reserved position for a partner logo: ~4mm on a 37mm dial,
+  // deliberately smaller/quieter than the 5mm crest. Drag a partner mark onto it.
+  const cbY=CY+Rdial*0.42;             // above 6 o'clock
+  const cbR=Rdial*0.052;               // ~4mm equiv (crest is ~0.06 = 5mm)
+  // subtle reserved ring (placeholder for partner logo)
+  const slot=document.createElementNS(NS,"circle");
+  slot.setAttribute("cx",CX); slot.setAttribute("cy",cbY); slot.setAttribute("r",cbR);
+  slot.setAttribute("fill","none"); slot.setAttribute("stroke",t.sub);
+  slot.setAttribute("stroke-width",Rdial*0.004); slot.setAttribute("opacity","0.55");
+  slot.setAttribute("stroke-dasharray",`${Rdial*0.012} ${Rdial*0.012}`);
+  svg.appendChild(slot);
+  const slotTxt=document.createElementNS(NS,"text");
+  slotTxt.setAttribute("x",CX); slotTxt.setAttribute("y",cbY+Rdial*0.012);
+  slotTxt.setAttribute("text-anchor","middle"); slotTxt.setAttribute("fill",t.sub);
+  slotTxt.setAttribute("font-family","Arial,Helvetica,sans-serif");
+  slotTxt.setAttribute("font-size",Rdial*0.020); slotTxt.setAttribute("opacity","0.5");
+  slotTxt.setAttribute("letter-spacing",Rdial*0.004);
+  slotTxt.textContent="PARTNER"; svg.appendChild(slotTxt);
+  // MASTER CHRONOMETER below the co-brand slot
+  const mc=document.createElementNS(NS,"text");
+  mc.setAttribute("x",CX); mc.setAttribute("y",cbY+cbR+Rdial*0.055);
+  mc.setAttribute("text-anchor","middle"); mc.setAttribute("fill",t.sub);
+  mc.setAttribute("font-family","Arial,Helvetica,sans-serif"); mc.setAttribute("font-weight","500");
+  mc.setAttribute("letter-spacing",Rdial*0.012);
+  mc.setAttribute("font-size",Rdial*0.034); mc.textContent="MASTER CHRONOMETER";
+  svg.appendChild(mc);
+
+  // ====== LIVE INDICATORS ======
+  const s=simSeconds%60, sFloor=Math.floor(s), sFrac=s-sFloor;
+  const m=Math.floor(simSeconds/60)%60;
+  const h12=Math.floor(simSeconds/3600)%12;
+
+  // SECOND ring (60) — sweeping glow near rim
+  const Rsec=Rdial*0.80;
+  for(let i=0;i<60;i++){
+    let v=0; if(i===sFloor)v=1-sFrac; else if(i===(sFloor+1)%60)v=sFrac;
+    if(v<0.04) continue;
+    const a=(i*6-90)*Math.PI/180;
+    const dot=document.createElementNS(NS,"circle");
+    dot.setAttribute("cx",CX+Rsec*Math.cos(a)); dot.setAttribute("cy",CY+Rsec*Math.sin(a));
+    dot.setAttribute("r",Rdial*0.013); dot.setAttribute("fill",t.sec);
+    dot.setAttribute("opacity",v.toFixed(2));
+    dot.setAttribute("filter","url(#glow)");
+    svg.appendChild(dot);
+  }
+
+  // MINUTE flush hand — center to ring
+  const am=(m*6-90)*Math.PI/180;
+  const mh=document.createElementNS(NS,"line");
+  mh.setAttribute("x1",CX);mh.setAttribute("y1",CY);
+  mh.setAttribute("x2",CX+Rdial*0.74*Math.cos(am));mh.setAttribute("y2",CY+Rdial*0.74*Math.sin(am));
+  mh.setAttribute("stroke",t.min);mh.setAttribute("stroke-width",Rdial*0.016);
+  mh.setAttribute("stroke-linecap","round");mh.setAttribute("filter","url(#glow)");
+  svg.appendChild(mh);
+
+  // HOUR raised hand — short + thick
+  const ah=((h12*30 + m*0.5)-90)*Math.PI/180;
+  const hh=document.createElementNS(NS,"line");
+  hh.setAttribute("x1",CX);hh.setAttribute("y1",CY);
+  hh.setAttribute("x2",CX+Rdial*0.46*Math.cos(ah));hh.setAttribute("y2",CY+Rdial*0.46*Math.sin(ah));
+  hh.setAttribute("stroke",t.hour);hh.setAttribute("stroke-width",Rdial*0.028);
+  hh.setAttribute("stroke-linecap","round");hh.setAttribute("filter","url(#glow)");
+  svg.appendChild(hh);
+
+  // center cap / seconds dot (as in HUME design)
+  const cap=document.createElementNS(NS,"circle");
+  cap.setAttribute("cx",CX);cap.setAttribute("cy",CY);cap.setAttribute("r",Rdial*0.022);
+  cap.setAttribute("fill",t.dot); svg.appendChild(cap);
+
+  // glow filter
+  const defs=document.createElementNS(NS,"defs");
+  defs.innerHTML=`<filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="${Rdial*0.012}" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
+  svg.insertBefore(defs, svg.firstChild);
+
+  const hh2=String(Math.floor(simSeconds/3600)%24).padStart(2,"0");
+  document.getElementById("clock").textContent=`${hh2}:${String(m).padStart(2,"0")}:${String(sFloor).padStart(2,"0")}`;
+}
+
+function loop(now){
+  requestAnimationFrame(loop);
+  const dt=(now-last)/1000; last=now;
+  if(playing) simSeconds+=dt*speed;
+  draw();
+}
+requestAnimationFrame(loop);
+
+document.getElementById("play").onclick=function(){playing=!playing;this.textContent=playing?"Pause":"Play";};
+document.getElementById("speed").oninput=function(){speed=+this.value;document.getElementById("spd").textContent=speed+"×";};
+document.getElementById("inv").onchange=function(){inverse=this.checked;};
+addEventListener("resize",layout);
+</script>

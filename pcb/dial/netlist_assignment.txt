@@ -1,0 +1,8 @@
+DIAL CHARLIEPLEX NET ASSIGNMENT
+================================
+13 nets: CP0..CP12  (each = one MCU pin through one ~47ohm series resistor)
+Each LED Dn: anode -> net_anode, cathode -> net_cathode  (see dial_placement.csv)
+Antiparallel partner of (CPa anode, CPb cathode) is the LED with (CPb anode, CPa cathode).
+
+Assign these in the SCHEMATIC (net labels on each LED), then import netlist to the PCB.
+The placement script positions parts; nets come from the schematic.
