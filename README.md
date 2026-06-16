@@ -15,15 +15,15 @@ The "132" is the watch: **60 second + 60 minute + 12 hour** LEDs. As the platfor
 scales (the driver supports more), the model number scales with it.
 
 > [!IMPORTANT]
-> This project is a work in progress, please use repo at your own risk.
-> 
 > **Current project status:
 > Design complete, pre-fabrication.** Architecture, geometry, power
 > budget, BOM, firmware structure, and KiCad inputs are specified. No boards
 > ordered yet. See [Build status](#build-status).
 
 > [!CAUTION]
-> The goal for this project is to see how far Claude can go building a homebrew diy watch. I'm still deep in the weeds with Claude and haven't evaluated everything in this repo, so proceed with caution.
+> This project started as an excercise to test Claude's abilities outside of work
+> related tasks. My goal is to see if it can handle the entire design process
+> end-to-end. Proceed with caution before forking or using this repo.
 
 ---
 
