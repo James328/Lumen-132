@@ -1,16 +1,9 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="renders/hume-lumen-132_logo.png">
-    <img alt="HUME Lumen 132" src="renders/hume-lumen-132_logo.png" width="75" align="right">
+    <img alt="HUME Lumen 132" src="renders/hume-lumen-132_logo.png" width="80" align="left">
 </picture>
 
 # Lumen 132
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="renders/HUME-Lumen-132.gif">
-  <p width="100%" align="center">
-    <img alt="HUME Lumen 132" src="renders/HUME-Lumen-132.gif" width="640">
-  </p>
-</picture>
 
 An open-hardware **LED wristwatch** that tells time with light. No mechanical hands,
 no display module — time is shown by **132 individually-addressable LEDs** in
@@ -20,6 +13,13 @@ press the crown, then lights the time for a few seconds and sleeps again.
 
 The "132" is the watch: **60 second + 60 minute + 12 hour** LEDs. As the platform
 scales (the driver supports more), the model number scales with it.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="renders/HUME-Lumen-132.gif">
+  <p width="100%" align="center">
+    <img alt="HUME Lumen 132" src="renders/HUME-Lumen-132.gif" width="640">
+  </p>
+</picture>
 
 > [!IMPORTANT]
 > **Current project status:
