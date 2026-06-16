@@ -7,6 +7,11 @@
 Sparse 2-layer board stacking under the dial. Holds the brain, the LED driver(s),
 timekeeping, motion wake, and power.
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="controller_pcb.png">
+  <img alt="HUME Lumen 132" src="controller_pcb.png" width="640">
+</picture>
+
 | Part | Ref | Role |
 |---|---|---|
 | ATtiny3217 | U1 | MCU. Sleeps ~1µA. Only ~7 of 22 I/O used. |
