@@ -1,8 +1,15 @@
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="renders/hume-lumen-132_logo.png">
+    <img alt="HUME Lumen 132" src="renders/hume-lumen-132_logo.png" width="75" align="right">
+</picture>
+
 # Lumen 132
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="renders/HUME-Lumen-132.gif">
-  <img alt="HUME Lumen 132" src="renders/HUME-Lumen-132.gif">
+  <p width="100%" align="center">
+    <img alt="HUME Lumen 132" src="renders/HUME-Lumen-132.gif" width="640">
+  </p>
 </picture>
 
 An open-hardware **LED wristwatch** that tells time with light. No mechanical hands,
